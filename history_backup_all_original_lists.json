@@ -1,0 +1,336 @@
+{
+  "backup_timestamp": "2026-09-22T13:10:21.768607",
+  "description": "구글 지도 저장함 원본 여행 목록 히스토리 백업",
+  "lists": {
+    "2026 스페인 포르토 여행": [
+      {
+        "name": "La Tasqueta de Blai",
+        "tag": "€10~20",
+        "fullText": "La Tasqueta de Blai\n4.5(11,086)\n€10~20\n· 타파스 바"
+      },
+      {
+        "name": "Bloody Mary Cocktail Bar",
+        "tag": "€10~20",
+        "fullText": "Bloody Mary Cocktail Bar\n4.7(1,456)\n€10~20\n· 칵테일바"
+      },
+      {
+        "name": "Can Ramonet",
+        "tag": "€30~50",
+        "fullText": "Can Ramonet\n4.4(5,959)\n€30~50\n· 지중해 요리"
+      },
+      {
+        "name": "Turó de la Rovira",
+        "tag": "지역사 박물관",
+        "fullText": "Turó de la Rovira\n4.6(17,548)\n지역사 박물관"
+      },
+      {
+        "name": "Vinitus",
+        "tag": "€20~30",
+        "fullText": "Vinitus\n4.5(17,719)\n€20~30\n· 타파스"
+      },
+      {
+        "name": "시우다드 콘달",
+        "tag": "€20~30",
+        "fullText": "시우다드 콘달\n4.4(23,427)\n€20~30\n· 타파스 바"
+      },
+      {
+        "name": "Catedral-Basílica de Santa María de Mallorca",
+        "tag": "대성당",
+        "fullText": "Catedral-Basílica de Santa María de Mallorca\n4.7(68,153)\n대성당"
+      },
+      {
+        "name": "Sa Calobra",
+        "tag": "해변",
+        "fullText": "Sa Calobra\n4.6(3,122)\n해변"
+      },
+      {
+        "name": "Cala Llombards",
+        "tag": "명승지",
+        "fullText": "Cala Llombards\n4.4(3,496)\n명승지"
+      },
+      {
+        "name": "Cala Ferrera",
+        "tag": "Cala Ferrera\nBalearic Islands\n스페인",
+        "fullText": "Cala Ferrera\nBalearic Islands\n스페인"
+      },
+      {
+        "name": "Cala Mendia",
+        "tag": "만/포구",
+        "fullText": "Cala Mendia\n4.6(382)\n만/포구"
+      },
+      {
+        "name": "Caló del Moro",
+        "tag": "해변",
+        "fullText": "Caló del Moro\n4.5(9,466)\n해변"
+      },
+      {
+        "name": "Meia-Nau Porto",
+        "tag": "€20~40",
+        "fullText": "Meia-Nau Porto\n4.7(1,781)\n€20~40\n· 음식점"
+      },
+      {
+        "name": "Vinhas d'Alho",
+        "tag": "€20~45",
+        "fullText": "Vinhas d'Alho\n4.2(2,333)\n€20~45\n· 음식점"
+      },
+      {
+        "name": "Taberna dos Fernandes",
+        "tag": "€20~40",
+        "fullText": "Taberna dos Fernandes\n4.8(1,804)\n€20~40\n· 포르투갈 요리"
+      },
+      {
+        "name": "Restaurante Cantina 32",
+        "tag": "€20~45",
+        "fullText": "Restaurante Cantina 32\n4.3(3,636)\n€20~45\n· 포르투갈 요리"
+      },
+      {
+        "name": "카자 드 샤 다 보아 노바",
+        "tag": "€50 이상",
+        "fullText": "카자 드 샤 다 보아 노바\n4.6(1,327)\n€50 이상\n· 고급 레스토랑 요리"
+      },
+      {
+        "name": "Praça Ribeira",
+        "tag": "",
+        "fullText": "Praça Ribeira"
+      },
+      {
+        "name": "수정궁 정원",
+        "tag": "정원",
+        "fullText": "수정궁 정원\n4.6(48,768)\n정원"
+      },
+      {
+        "name": "모루 정원",
+        "tag": "정원",
+        "fullText": "모루 정원\n4.7(35,959)\n정원"
+      },
+      {
+        "name": "El Pasaje Tapas",
+        "tag": "€20~30",
+        "fullText": "El Pasaje Tapas\n4.6(10,548)\n€20~30\n· 타파스"
+      },
+      {
+        "name": "메트로폴 파라솔(라스 세타스 데 세비야)",
+        "tag": "문화적 랜드마크",
+        "fullText": "메트로폴 파라솔(라스 세타스 데 세비야)\n4.4(111,901)\n문화적 랜드마크"
+      },
+      {
+        "name": "스페인 광장",
+        "tag": "대광장",
+        "fullText": "스페인 광장\n4.8(190,280)\n대광장"
+      },
+      {
+        "name": "El Jueves rastro",
+        "tag": "벼룩시장",
+        "fullText": "El Jueves rastro\n4.1(165)\n벼룩시장"
+      },
+      {
+        "name": "팔라시오 데 라스 두에나스",
+        "tag": "역사적 명소",
+        "fullText": "팔라시오 데 라스 두에나스\n4.4(11,649)\n역사적 명소"
+      },
+      {
+        "name": "카사 데 필라토스",
+        "tag": "역사 유적지 박물관",
+        "fullText": "카사 데 필라토스\n4.4(14,888)\n역사 유적지 박물관"
+      },
+      {
+        "name": "Santa Cruz, Seville",
+        "tag": "Casco Antiguo",
+        "fullText": "Santa Cruz, Seville\nCasco Antiguo\nSeville\n스페인"
+      },
+      {
+        "name": "알카사르",
+        "tag": "성곽",
+        "fullText": "알카사르\n4.7(103,200)\n성곽"
+      },
+      {
+        "name": "Casa Salesas",
+        "tag": "€30~70",
+        "fullText": "Casa Salesas\n4.4(1,743)\n€30~70\n· 스페인 요리"
+      },
+      {
+        "name": "메손 델 참피뇬",
+        "tag": "€10~20",
+        "fullText": "메손 델 참피뇬\n4.4(6,302)\n€10~20\n· 음식점"
+      },
+      {
+        "name": "레티로 공원",
+        "tag": "공원",
+        "fullText": "레티로 공원\n4.8(215,763)\n공원"
+      },
+      {
+        "name": "구엘 공원",
+        "tag": "공원",
+        "fullText": "구엘 공원\n4.4(242,060)\n공원"
+      },
+      {
+        "name": "사그라다 파밀리아",
+        "tag": "바실리카",
+        "fullText": "사그라다 파밀리아\n4.8(333,405)\n바실리카"
+      },
+      {
+        "name": "까사 비센스",
+        "tag": "박물관",
+        "fullText": "까사 비센스\n4.7(22,954)\n박물관"
+      },
+      {
+        "name": "카사 바트요",
+        "tag": "역사적 명소",
+        "fullText": "카사 바트요\n4.7(220,092)\n역사적 명소"
+      },
+      {
+        "name": "마드리드 왕립식물원",
+        "tag": "식물원",
+        "fullText": "마드리드 왕립식물원\n4.4(37,146)\n식물원"
+      },
+      {
+        "name": "프라도 미술관",
+        "tag": "미술관",
+        "fullText": "프라도 미술관\n4.7(156,799)\n미술관"
+      },
+      {
+        "name": "마드리드 왕궁",
+        "tag": "성곽",
+        "fullText": "마드리드 왕궁\n4.7(133,509)\n성곽"
+      },
+      {
+        "name": "Bocadillos Oink Gran Vía",
+        "tag": "€1~10",
+        "fullText": "Bocadillos Oink Gran Vía\n4.6(973)\n€1~10\n· 샌드위치"
+      },
+      {
+        "name": "Hotel Posada del Lucero | Monumento Nacional",
+        "tag": "4성급 호텔",
+        "fullText": "Hotel Posada del Lucero | Monumento Nacional\n4.7(1,077)\n4성급 호텔"
+      },
+      {
+        "name": "HOTEL REGINA BARCELONA",
+        "tag": "4성급 호텔",
+        "fullText": "HOTEL REGINA BARCELONA\n4.4(1,407)\n4성급 호텔"
+      },
+      {
+        "name": "Hotel Cala d'Or",
+        "tag": "4성급 호텔",
+        "fullText": "Hotel Cala d'Or\n4.5(885)\n4성급 호텔"
+      },
+      {
+        "name": "쥬스코베르타스 부티크 호텔 포르투",
+        "tag": "4성급 호텔",
+        "fullText": "쥬스코베르타스 부티크 호텔 포르투\n4.4(341)\n4성급 호텔"
+      },
+      {
+        "name": "카탈로니아 아토차",
+        "tag": "4성급 호텔",
+        "fullText": "카탈로니아 아토차\n4.6(4,967)\n4성급 호텔"
+      }
+    ],
+    "2026 이탈리아 프랑스 여행": [
+      {
+        "listName": "2026 이탈리아 프랑스 여행",
+        "name": "레티로 공원",
+        "tag": "공원",
+        "fullCardText": "레티로 공원\n4.8(215,763)\n공원"
+      },
+      {
+        "listName": "2026 이탈리아 프랑스 여행",
+        "name": "Le Frog",
+        "tag": "€20~60",
+        "fullCardText": "Le Frog\n4.4(2,724)\n€20~60\n· 프랑스 요리"
+      },
+      {
+        "listName": "2026 이탈리아 프랑스 여행",
+        "name": "La Pecora Pazza",
+        "tag": "€10~20",
+        "fullCardText": "La Pecora Pazza\n4.7(1,860)\n€10~20\n· 음식점"
+      },
+      {
+        "listName": "2026 이탈리아 프랑스 여행",
+        "name": "Mr.Clood Bistrot",
+        "tag": "€20~30",
+        "fullCardText": "Mr.Clood Bistrot\n4.8(762)\n€20~30\n· 비스트로"
+      },
+      {
+        "listName": "2026 이탈리아 프랑스 여행",
+        "name": "Via Stefano Canzio, 6",
+        "tag": "20131 Milano MI",
+        "fullCardText": "Via Stefano Canzio, 6\n20131 Milano MI\n이탈리아"
+      }
+    ],
+    "2026 대만": [
+      {
+        "listName": "2026 대만",
+        "name": "지우펀",
+        "tag": "",
+        "fullCardText": "지우펀"
+      },
+      {
+        "listName": "2026 대만",
+        "name": "스펀 천등광장",
+        "tag": "주차장",
+        "fullCardText": "스펀 천등광장\n4.4(2,134)\n주차장"
+      },
+      {
+        "listName": "2026 대만",
+        "name": "예류지질공원",
+        "tag": "자연보호구역",
+        "fullCardText": "예류지질공원\n4.4(53,704)\n자연보호구역"
+      },
+      {
+        "listName": "2026 대만",
+        "name": "타이베이 시립 동물원",
+        "tag": "동물원",
+        "fullCardText": "타이베이 시립 동물원\n4.6(78,110)\n동물원"
+      },
+      {
+        "listName": "2026 대만",
+        "name": "타이베이101 전망대",
+        "tag": "관측소",
+        "fullCardText": "타이베이101 전망대\n4.5(39,299)\n관측소"
+      },
+      {
+        "listName": "2026 대만",
+        "name": "중정기념당",
+        "tag": "문화적 랜드마크",
+        "fullCardText": "중정기념당\n4.5(82,640)\n문화적 랜드마크"
+      },
+      {
+        "listName": "2026 대만",
+        "name": "미드타운리처드슨 호텔",
+        "tag": "4성급 호텔",
+        "fullCardText": "미드타운리처드슨 호텔\n3.7(11,308)\n4성급 호텔"
+      }
+    ],
+    "대만 식당": [
+      {
+        "listName": "대만 식당",
+        "name": "레이허우",
+        "tag": "NT$200~400",
+        "fullCardText": "레이허우\n4.7(897)\nNT$200~400\n· 음식점"
+      },
+      {
+        "listName": "대만 식당",
+        "name": "은하동(銀河洞-韓式pocha)",
+        "tag": "NT$600~800",
+        "fullCardText": "은하동(銀河洞-韓式pocha)\n4.8(1,117)\nNT$600~800\n· 한식"
+      },
+      {
+        "listName": "대만 식당",
+        "name": "키키레스토랑 (att 4 fun 지점)",
+        "tag": "NT$400~1,000",
+        "fullCardText": "키키레스토랑 (att 4 fun 지점)\n4.1(580)\nNT$400~1,000\n· 대만 요리"
+      }
+    ],
+    "여행 계획": [],
+    "즐겨찾기": [
+      "La Pecora Pazza",
+      "Mr.Clood Bistrot",
+      "Pizza 4P’s Bao Khanh"
+    ],
+    "가고 싶은 장소": [
+      "Lai Heen"
+    ],
+    "Saved places": [
+      "Via Stefano Canzio, 6"
+    ]
+  }
+}
