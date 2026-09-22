@@ -8,6 +8,7 @@ Handles reading/writing master places database and syncing MyMaps CSV bundles.
 import os
 import json
 import csv
+import re
 from pathlib import Path
 from datetime import datetime
 from urllib.parse import quote
@@ -124,44 +125,53 @@ def find_places_by_region_or_query(query=""):
     ]
 
 
+def sanitize_region_name(region):
+    """Sanitize region name for safe filesystem directory and file names."""
+    if not region or not str(region).strip() or str(region).strip() in ["미지정", "기타"]:
+        return "기타"
+    cleaned = re.sub(r'[\\/*?:"<>|]', '_', str(region).strip())
+    cleaned = cleaned.strip(". ")
+    return cleaned or "기타"
+
+
+def get_available_regions():
+    """Return sorted list of unique sanitized region names in master database."""
+    places = load_places()
+    regions = set(sanitize_region_name(p.get("region")) for p in places)
+    return sorted(list(regions))
+
+
+def load_places_by_region(region_name):
+    """Load places belonging to a specific region (matches exact or sanitized name)."""
+    places = load_places()
+    target = sanitize_region_name(region_name).lower()
+    return [
+        p for p in places
+        if sanitize_region_name(p.get("region")).lower() == target
+        or target in p.get("region", "").lower()
+    ]
+
+
 def sync_mymaps_csvs(places=None):
     """
-    Regenerate CSV files in data/mymaps/ partitioned strictly by the canonical 6 categories.
-    All places regardless of region are accumulated into these unified files.
-    Any rogue or regional CSV files (e.g. 후쿠오카_*.csv) are purged.
+    Regenerate CSV files in data/mymaps/ partitioned by region and canonical categories.
+    Structure:
+      - data/mymaps/{region}/내지도_{카테고리}.csv (지역별 카테고리 분리 파일)
+      - data/mymaps/{region}/{region}_전체.csv (해당 지역 모든 장소 단일 레이어용)
+      - data/mymaps/_전체_통합/내지도_{카테고리}.csv & 전체_장소_통합.csv
+      - data/mymaps/내지도_{카테고리}.csv (루트 단일 통합 유지로 상위 호환성 보장)
     """
     if places is None:
         places = load_places()
 
     MYMAPS_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Strictly purge any rogue or regional CSV files to enforce single accumulated files per category
-    allowed_files = set(CATEGORY_FILE_MAP.values())
-    for extra_file in MYMAPS_DIR.glob("*.csv"):
-        if extra_file.name not in allowed_files:
-            try:
-                extra_file.unlink()
-            except Exception:
-                pass
-
-    # Group by category
-    grouped = {cat: [] for cat in CATEGORIES}
-    for p in places:
-        cat = p.get("category", "기타")
-        if cat not in grouped:
-            cat = "기타"
-        grouped[cat].append(p)
-
-    # Google My Maps optimal CSV fields:
-    # 1. '장소 이름' -> Marker Title
-    # 2. '검색위치' -> Marker Location/Geocoding query (combines clean name + region)
-    # 3. '카테고리', '세부 태그/설명', '지역', '구글 지도 링크', '출처' -> Marker Info Card
     fieldnames = ["장소 이름", "검색위치", "카테고리", "세부 태그/설명", "지역", "구글 지도 링크", "출처"]
-    
-    for cat, items in grouped.items():
-        filename = CATEGORY_FILE_MAP.get(cat, f"내지도_{cat}.csv")
-        filepath = MYMAPS_DIR / filename
-        
+
+    def _write_csv(filepath, items):
+        if not items:
+            return
+        filepath.parent.mkdir(parents=True, exist_ok=True)
         with open(filepath, "w", encoding="utf-8-sig", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
@@ -181,9 +191,59 @@ def sync_mymaps_csvs(places=None):
                     "출처": it.get("original_source", "")
                 })
 
+    # 1. Group places by sanitized region
+    regions_map = {}
+    for p in places:
+        reg_key = sanitize_region_name(p.get("region"))
+        regions_map.setdefault(reg_key, []).append(p)
+
+    summary = {
+        "total_places": len(places),
+        "regions": {}
+    }
+
+    # 2. Generate region-specific CSV files in data/mymaps/{region}/
+    for reg_name, reg_places in regions_map.items():
+        reg_dir = MYMAPS_DIR / reg_name
+        reg_dir.mkdir(parents=True, exist_ok=True)
+
+        reg_cat_counts = {}
+        for cat in CATEGORIES:
+            cat_places = [p for p in reg_places if p.get("category", "기타") == cat]
+            if cat_places:
+                filename = CATEGORY_FILE_MAP.get(cat, f"내지도_{cat}.csv")
+                _write_csv(reg_dir / filename, cat_places)
+                reg_cat_counts[cat] = len(cat_places)
+
+        # Region full places CSV
+        all_reg_filename = f"{reg_name}_전체.csv"
+        _write_csv(reg_dir / all_reg_filename, reg_places)
+
+        summary["regions"][reg_name] = {
+            "count": len(reg_places),
+            "categories": reg_cat_counts,
+            "dir": str(reg_dir)
+        }
+
+    # 3. Generate unified CSV bundles (_전체_통합 and root data/mymaps/ for backward compatibility)
+    unified_dir = MYMAPS_DIR / "_전체_통합"
+    unified_dir.mkdir(parents=True, exist_ok=True)
+
+    for cat in CATEGORIES:
+        cat_places = [p for p in places if p.get("category", "기타") == cat]
+        filename = CATEGORY_FILE_MAP.get(cat, f"내지도_{cat}.csv")
+        # Write to _전체_통합
+        _write_csv(unified_dir / filename, cat_places)
+        # Write to root data/mymaps/
+        _write_csv(MYMAPS_DIR / filename, cat_places)
+
+    _write_csv(unified_dir / "전체_장소_통합.csv", places)
+
+    return summary
+
 
 if __name__ == "__main__":
     places = load_places()
     print(f"Loaded {len(places)} places from storage.")
-    sync_mymaps_csvs(places)
-    print("MyMaps CSV sync complete.")
+    res = sync_mymaps_csvs(places)
+    print(f"MyMaps sync complete: {len(res['regions'])} regions processed.")

@@ -35,21 +35,34 @@ def handle_add_link(args):
         p = item["place"]
         act = "신규 저장" if item["action"] == "added" else "기존 정보 업데이트"
         print(f" - [{p['category']}] {p['name']} ({act}) -> {p['google_maps_url']}")
-    print("\n📁 'data/mymaps/' 5대 카테고리 단일 CSV(내지도_*.csv)에 모든 장소가 누적 동기화되었습니다.")
+    print("\n📁 지역별 MyMaps 폴더('data/mymaps/<지역>/') 및 통합 CSV에 모든 장소가 동기화되었습니다.")
 
 
 def handle_mymaps(args):
     places = load_places()
-    sync_mymaps_csvs(places)
-    print("=" * 60)
-    print(f"🗺️ 구글 내 지도(My Maps) 레이어별 통합 CSV 현황 (총 {len(places)}곳)")
-    print("=" * 60)
-    for cat, filename in CATEGORY_FILE_MAP.items():
-        filepath = MYMAPS_DIR / filename
-        count = sum(1 for p in places if p.get("category") == cat)
-        print(f" - [{cat}] {filename}: 총 {count}곳 저장됨")
-    print(f"\n📂 저장 디렉터리: {MYMAPS_DIR}")
-    print("💡 My Maps(mymaps.google.com) 레이어별 업로드 시 단일 카테고리 파일만 업로드하시면 전 세계 장소가 자동 시각화됩니다.")
+    summary = sync_mymaps_csvs(places)
+    print("=" * 65)
+    print(f"🗺️ 구글 내 지도(My Maps) 지역별 & 카테고리별 CSV 현황 (총 {len(places)}곳)")
+    print("=" * 65)
+    
+    print("\n📍 [지역별 내 지도 CSV 파일 현황]")
+    for reg_name, info in sorted(summary["regions"].items(), key=lambda x: -x[1]["count"]):
+        cat_str = ", ".join(f"{cat}: {cnt}곳" for cat, cnt in info["categories"].items())
+        print(f" • 📁 {reg_name} (총 {info['count']}곳)")
+        print(f"   - 경로: data/mymaps/{reg_name}/")
+        print(f"   - 세부 분포: {cat_str}")
+        print(f"   - 레이어 파일: 내지도_*.csv 및 {reg_name}_전체.csv")
+        
+    print("\n🌐 [전체 통합 CSV]")
+    print(f" • 📁 _전체_통합 (총 {len(places)}곳)")
+    print(f"   - 경로: data/mymaps/_전체_통합/ 및 data/mymaps/")
+    
+    print("\n💡 [구글 내 지도(mymaps.google.com) 활용 꿀팁]")
+    print(" 1. 특정 여행지(예: 후쿠오카, 스페인 등)를 계획할 때:")
+    print("    - 해당 지역 폴더(data/mymaps/<지역>/)의 '내지도_*.csv'를 레이어별로 업로드하세요.")
+    print("    - 다른 나라 장소가 섞이지 않고 해당 여행지만 깔끔하게 지도에 핀으로 표시됩니다.")
+    print(" 2. 레이어를 1개만 쓰고 싶다면:")
+    print("    - '<지역>_전체.csv' 파일을 단일 레이어에 업로드하면 해당 지역 모든 장소가 한 번에 등록됩니다.")
 
 
 def handle_plan(args):
