@@ -37,6 +37,30 @@ def infer_region_from_text(text):
     return ""
 
 
+def build_google_maps_route_url(stops, travel_mode="walking"):
+    """
+    Build Google Maps multi-waypoint directions URL.
+    Format: https://www.google.com/maps/dir/?api=1&origin=A&destination=B&waypoints=C%7CD&travelmode=walking
+    """
+    from urllib.parse import quote
+    clean_stops = [s.strip() for s in stops if s and s.strip()]
+    if len(clean_stops) < 2:
+        return ""
+    
+    origin = quote(clean_stops[0])
+    destination = quote(clean_stops[-1])
+    
+    if len(clean_stops) > 2:
+        waypoints = "%7C".join(quote(s) for s in clean_stops[1:-1])
+        url = f"https://www.google.com/maps/dir/?api=1&origin={origin}&destination={destination}&waypoints={waypoints}"
+    else:
+        url = f"https://www.google.com/maps/dir/?api=1&origin={origin}&destination={destination}"
+        
+    if travel_mode:
+        url += f"&travelmode={travel_mode}"
+    return url
+
+
 def generate_itinerary(hotel_info, days, region=None, additional_notes=""):
     """
     Generate a complete day-by-day itinerary.
@@ -104,6 +128,8 @@ def generate_itinerary(hotel_info, days, region=None, additional_notes=""):
             "items": []
         }
 
+        day_stops = [hotel_info]
+
         # 1. Morning Start
         day_schedule["items"].append({
             "time": morning_start,
@@ -116,6 +142,7 @@ def generate_itinerary(hotel_info, days, region=None, additional_notes=""):
         # 2. Morning Sightseeing
         m_sight = pick_next(sightseeings)
         if m_sight:
+            day_stops.append(m_sight["name"])
             day_schedule["items"].append({
                 "time": "10:30 ~ 12:30",
                 "title": m_sight["name"],
@@ -128,6 +155,7 @@ def generate_itinerary(hotel_info, days, region=None, additional_notes=""):
         # 3. Lunch
         lunch_spot = pick_next(restaurants)
         if lunch_spot:
+            day_stops.append(lunch_spot["name"])
             day_schedule["items"].append({
                 "time": "12:30 ~ 14:00",
                 "title": lunch_spot["name"],
@@ -140,6 +168,7 @@ def generate_itinerary(hotel_info, days, region=None, additional_notes=""):
         # 4. Afternoon Cafe Break (as per user profile)
         cafe_spot = pick_next([r for r in restaurants if "카페" in r.get("tag", "") or "cafe" in r.get("name", "").lower()] or restaurants)
         if cafe_spot:
+            day_stops.append(cafe_spot["name"])
             day_schedule["items"].append({
                 "time": "14:15 ~ 15:30",
                 "title": f"{cafe_spot['name']} (카페 & 디저트)",
@@ -153,6 +182,7 @@ def generate_itinerary(hotel_info, days, region=None, additional_notes=""):
         if max_places_day >= 3:
             afternoon_spot = pick_next(shoppings) if (d % 2 == 0 and shoppings) else pick_next(sightseeings)
             if afternoon_spot:
+                day_stops.append(afternoon_spot["name"])
                 day_schedule["items"].append({
                     "time": "16:00 ~ 18:00",
                     "title": afternoon_spot["name"],
@@ -165,6 +195,7 @@ def generate_itinerary(hotel_info, days, region=None, additional_notes=""):
         # 6. Dinner
         dinner_spot = pick_next(restaurants)
         if dinner_spot:
+            day_stops.append(dinner_spot["name"])
             day_schedule["items"].append({
                 "time": "18:30 ~ 20:30",
                 "title": dinner_spot["name"],
@@ -175,6 +206,7 @@ def generate_itinerary(hotel_info, days, region=None, additional_notes=""):
             })
 
         # 7. Evening Return
+        day_stops.append(hotel_info)
         day_schedule["items"].append({
             "time": evening_return,
             "title": f"숙소 복귀 ({hotel_info})",
@@ -182,6 +214,10 @@ def generate_itinerary(hotel_info, days, region=None, additional_notes=""):
             "desc": "하루 일정 마무리 및 편안한 휴식",
             "link": ""
         })
+
+        # Generate connected Google Maps route URL
+        day_schedule["stops"] = day_stops
+        day_schedule["route_url"] = build_google_maps_route_url(day_stops)
 
         itinerary_days.append(day_schedule)
 
@@ -203,11 +239,19 @@ def generate_itinerary(hotel_info, days, region=None, additional_notes=""):
     for day in itinerary_days:
         doc_lines.append(f"## 📅 {day['title']}")
         doc_lines.append("")
-        doc_lines.append("| 시간대 | 구분 | 장소명 | 상세 설명 및 특징 | 구글 지도 |")
+        
+        # Connected Route Navigation Banner
+        if day.get("route_url"):
+            course_flow = " ➔ ".join(day["stops"])
+            doc_lines.append(f"> 🧭 **[🗺️ Day {day['day']} 하루 전체 연결 경로 구글 지도에서 보기 (클릭)]({day['route_url']})**  ")
+            doc_lines.append(f"> *하루 이동 동선: {course_flow}*")
+            doc_lines.append("")
+
+        doc_lines.append("| 시간대 | 구분 | 장소명 | 상세 설명 및 특징 | 개별 지도 링크 |")
         doc_lines.append("| :--- | :--- | :--- | :--- | :--- |")
         
         for it in day["items"]:
-            gmap_cell = f"[📍 지도 보기]({it['link']})" if it.get("link") else "-"
+            gmap_cell = f"[📍 상세 보기]({it['link']})" if it.get("link") else "-"
             cat_cell = it.get("category") or it.get("type", "일정")
             tag_text = f" `[{it.get('tag')}]`" if it.get("tag") else ""
             name_cell = f"**{it['title']}**{tag_text}"
@@ -215,7 +259,7 @@ def generate_itinerary(hotel_info, days, region=None, additional_notes=""):
             doc_lines.append(f"| {it['time']} | {cat_cell} | {name_cell} | {desc_cell} | {gmap_cell} |")
         
         doc_lines.append("")
-        doc_lines.append("> 💡 **동선 안내**: 위 일정은 숙소를 기점으로 동선이 겹치지 않도록 구성되었습니다. 도보 15분 이상 이동 시 버스 또는 지하철 이용을 권장합니다.")
+        doc_lines.append("> 💡 **동선 안내**: 위 일정은 숙소를 기점으로 동선이 겹치지 않도록 구성되었습니다. 상단의 **[하루 전체 연결 경로 구글 지도에서 보기]**를 누르시면 모든 장소가 순서대로 연결된 길찾기 화면이 열립니다.")
         doc_lines.append("")
         doc_lines.append("---")
         doc_lines.append("")
