@@ -56,7 +56,7 @@ def save_places(places):
     sync_mymaps_csvs(places)
 
 
-def add_place(name, category, tag="", region="", notes="", source_url=""):
+def add_place(name, category, tag="", region="", notes="", source_url="", google_maps_url=None):
     """
     Add a new place to master database (with duplicate check).
     Returns (created_place, is_duplicate).
@@ -67,11 +67,13 @@ def add_place(name, category, tag="", region="", notes="", source_url=""):
     # Check if place already exists
     for p in places:
         if p["name"].lower() == name.lower():
-            # Update notes or source if new info
+            # Update notes or source or maps url if new info
             if source_url and source_url not in p.get("original_source", ""):
                 p["original_source"] = f"{p.get('original_source', '')}, {source_url}".strip(", ")
             if notes and notes not in p.get("notes", ""):
                 p["notes"] = f"{p.get('notes', '')} | {notes}".strip(" |")
+            if google_maps_url and ("search/?api=1" in p.get("google_maps_url", "") or not p.get("google_maps_url")):
+                p["google_maps_url"] = google_maps_url
             save_places(places)
             return p, True
 
@@ -83,8 +85,10 @@ def add_place(name, category, tag="", region="", notes="", source_url=""):
     if category not in CATEGORIES:
         category = "기타"
 
-    encoded_query = quote(name)
-    gmaps_url = f"https://www.google.com/maps/search/?api=1&query={encoded_query}"
+    if not google_maps_url:
+        search_query = f"{name} {region}".strip() if region and region != "미지정" else name
+        encoded_query = quote(search_query)
+        google_maps_url = f"https://www.google.com/maps/search/?api=1&query={encoded_query}"
 
     new_place = {
         "id": new_id,
@@ -93,7 +97,7 @@ def add_place(name, category, tag="", region="", notes="", source_url=""):
         "tag": tag,
         "region": region or "미지정",
         "original_source": source_url or "사용자 추가",
-        "google_maps_url": gmaps_url,
+        "google_maps_url": google_maps_url,
         "notes": notes,
         "added_at": datetime.now().isoformat(timespec="seconds")
     }
@@ -121,11 +125,24 @@ def find_places_by_region_or_query(query=""):
 
 
 def sync_mymaps_csvs(places=None):
-    """Regenerate CSV files in data/mymaps/ partitioned by category."""
+    """
+    Regenerate CSV files in data/mymaps/ partitioned strictly by the canonical 6 categories.
+    All places regardless of region are accumulated into these unified files.
+    Any rogue or regional CSV files (e.g. 후쿠오카_*.csv) are purged.
+    """
     if places is None:
         places = load_places()
 
     MYMAPS_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Strictly purge any rogue or regional CSV files to enforce single accumulated files per category
+    allowed_files = set(CATEGORY_FILE_MAP.values())
+    for extra_file in MYMAPS_DIR.glob("*.csv"):
+        if extra_file.name not in allowed_files:
+            try:
+                extra_file.unlink()
+            except Exception:
+                pass
 
     # Group by category
     grouped = {cat: [] for cat in CATEGORIES}
@@ -135,8 +152,11 @@ def sync_mymaps_csvs(places=None):
             cat = "기타"
         grouped[cat].append(p)
 
-    # Write each CSV
-    fieldnames = ["장소 이름", "카테고리", "세부 태그/설명", "지역", "구글 지도 링크", "출처"]
+    # Google My Maps optimal CSV fields:
+    # 1. '장소 이름' -> Marker Title
+    # 2. '검색위치' -> Marker Location/Geocoding query (combines clean name + region)
+    # 3. '카테고리', '세부 태그/설명', '지역', '구글 지도 링크', '출처' -> Marker Info Card
+    fieldnames = ["장소 이름", "검색위치", "카테고리", "세부 태그/설명", "지역", "구글 지도 링크", "출처"]
     
     for cat, items in grouped.items():
         filename = CATEGORY_FILE_MAP.get(cat, f"내지도_{cat}.csv")
@@ -146,11 +166,17 @@ def sync_mymaps_csvs(places=None):
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
             for it in items:
+                name = it.get("name", "")
+                region = it.get("region", "")
+                clean_name = name.split(" / ")[0].split("(")[0].strip()
+                search_loc = f"{clean_name} {region}".strip() if region and region != "미지정" else clean_name
+                
                 writer.writerow({
-                    "장소 이름": it.get("name", ""),
+                    "장소 이름": name,
+                    "검색위치": search_loc,
                     "카테고리": it.get("category", ""),
                     "세부 태그/설명": it.get("tag", "") or it.get("notes", ""),
-                    "지역": it.get("region", ""),
+                    "지역": region,
                     "구글 지도 링크": it.get("google_maps_url", ""),
                     "출처": it.get("original_source", "")
                 })

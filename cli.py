@@ -9,7 +9,14 @@ import argparse
 import json
 from pathlib import Path
 
-from src.storage import load_places, find_places_by_region_or_query, CATEGORIES
+from src.storage import (
+    load_places,
+    find_places_by_region_or_query,
+    sync_mymaps_csvs,
+    CATEGORIES,
+    CATEGORY_FILE_MAP,
+    MYMAPS_DIR
+)
 from src.place_extractor import process_url_and_save_places
 from src.itinerary_generator import generate_itinerary
 from src.profile_manager import load_profile, update_profile_with_feedback, PROFILE_MD_PATH
@@ -23,12 +30,26 @@ def handle_add_link(args):
         print("💡 팁: AI Agent 대화창에서 링크를 공유해주시면 상세 본문을 읽어 직접 장소를 완벽하게 등록해드립니다.")
         return
 
-    print(f"✨ 총 {len(results)}개의 장소를 수집하여 구글 지도 저장소에 반영했습니다:")
+    print(f"✨ 총 {len(results)}개의 장소를 수집하여 마스터 DB 및 MyMaps CSV에 누적 반영했습니다:")
     for item in results:
         p = item["place"]
         act = "신규 저장" if item["action"] == "added" else "기존 정보 업데이트"
         print(f" - [{p['category']}] {p['name']} ({act}) -> {p['google_maps_url']}")
-    print("\n📁 'data/mymaps/' CSV 파일이 자동으로 최신화되었습니다.")
+    print("\n📁 'data/mymaps/' 5대 카테고리 단일 CSV(내지도_*.csv)에 모든 장소가 누적 동기화되었습니다.")
+
+
+def handle_mymaps(args):
+    places = load_places()
+    sync_mymaps_csvs(places)
+    print("=" * 60)
+    print(f"🗺️ 구글 내 지도(My Maps) 레이어별 통합 CSV 현황 (총 {len(places)}곳)")
+    print("=" * 60)
+    for cat, filename in CATEGORY_FILE_MAP.items():
+        filepath = MYMAPS_DIR / filename
+        count = sum(1 for p in places if p.get("category") == cat)
+        print(f" - [{cat}] {filename}: 총 {count}곳 저장됨")
+    print(f"\n📂 저장 디렉터리: {MYMAPS_DIR}")
+    print("💡 My Maps(mymaps.google.com) 레이어별 업로드 시 단일 카테고리 파일만 업로드하시면 전 세계 장소가 자동 시각화됩니다.")
 
 
 def handle_plan(args):
@@ -103,6 +124,9 @@ def main():
     # profile
     parser_prof = subparsers.add_parser("profile", help="현재 여행 취향 프로필 확인")
 
+    # mymaps
+    parser_mymaps = subparsers.add_parser("mymaps", help="구글 내 지도(My Maps) 카테고리별 누적 CSV 상태 확인 및 재생성")
+
     # list
     parser_list = subparsers.add_parser("list", help="저장된 장소 조회")
     parser_list.add_argument("--category", "-c", choices=CATEGORIES, help="카테고리 필터")
@@ -112,6 +136,8 @@ def main():
 
     if args.command == "add-link":
         handle_add_link(args)
+    elif args.command == "mymaps":
+        handle_mymaps(args)
     elif args.command == "plan":
         handle_plan(args)
     elif args.command == "feedback":

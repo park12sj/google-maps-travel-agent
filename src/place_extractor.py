@@ -56,8 +56,11 @@ def classify_category(name, text_context=""):
     return "기타"
 
 
+import ssl
+
 def fetch_url_content(url):
     """Fetch raw HTML / text content with custom User-Agent."""
+    ctx = ssl._create_unverified_context()
     req = urllib.request.Request(
         url,
         headers={
@@ -66,7 +69,7 @@ def fetch_url_content(url):
         }
     )
     try:
-        with urllib.request.urlopen(req, timeout=12) as response:
+        with urllib.request.urlopen(req, timeout=12, context=ctx) as response:
             content = response.read().decode("utf-8", errors="ignore")
             return content
     except Exception as e:
@@ -77,12 +80,13 @@ def fetch_url_content(url):
 def extract_from_youtube(url, html_content=""):
     """Extract metadata and place mentions from YouTube video."""
     video_info = {"title": "", "description": "", "places": []}
+    ctx = ssl._create_unverified_context()
     
     # Try oEmbed API for video title
     oembed_url = f"https://www.youtube.com/oembed?url={urllib.parse.quote(url)}&format=json"
     try:
         req = urllib.request.Request(oembed_url, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=6) as resp:
+        with urllib.request.urlopen(req, timeout=6, context=ctx) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             video_info["title"] = data.get("title", "")
     except Exception:
@@ -97,32 +101,62 @@ def extract_from_youtube(url, html_content=""):
         if title_match:
             video_info["title"] = html.unescape(title_match.group(1)).replace(" - YouTube", "").strip()
 
-    desc_match = re.search(r'"shortDescription":"(.*?)"', html_content)
+    desc_match = re.search(r'"shortDescription":"(.*?)"(?:,"isCrawlable"|,"thumbnail")', html_content)
     if desc_match:
-        video_info["description"] = bytes(desc_match.group(1), "utf-8").decode("unicode_escape", errors="ignore")
+        try:
+            raw_desc = desc_match.group(1)
+            video_info["description"] = json.loads('"' + raw_desc.replace('"', '\\"') + '"')
+        except Exception:
+            video_info["description"] = bytes(desc_match.group(1), "utf-8").decode("unicode_escape", errors="ignore")
 
     # Combine text for place search
     full_text = f"{video_info['title']}\n{video_info['description']}"
     
-    # Heuristic place extraction from description timestamps or bullet lines
-    # e.g., 01:23 [식당이름] or 1. 장소이름 or 📍 장소이름
+    # Heuristic place extraction from description timestamps, bullet lines, and map links
     extracted_candidates = []
     lines = full_text.splitlines()
-    for line in lines:
+    for i, line in enumerate(lines):
         line_clean = line.strip()
-        # Look for patterns like: 02:45 바르셀로나 사그라다 파밀리아 or 📍 츄레리아
+        # Look for patterns like: 02:45 스시사카바 or 📍 츄레리아 or 1. 야키니쿠 규센닌 : https://maps.app.goo.gl/...
+        map_url = ""
+        # Check next 3 lines for a google maps link
+        for next_line in lines[i:min(i+4, len(lines))]:
+            map_match = re.search(r"(https://(?:maps\.app\.goo\.gl|goo\.gl/maps|www\.google\.com/maps)[^\s]+)", next_line)
+            if map_match:
+                map_url = map_match.group(1)
+                break
+
         time_match = re.search(r"(?:\d{1,2}:\d{2})\s*(?:-\s*)?([A-Za-z0-9가-힣\s\'-]{2,30})", line_clean)
         if time_match:
             cand = time_match.group(1).strip()
-            if cand and len(cand) > 1:
-                extracted_candidates.append((cand, line_clean))
+            if cand and len(cand) > 1 and cand not in ["인트로", "잡설", "일정짜기", "가볼 만한 곳", "후쿠오카 감잡기"]:
+                extracted_candidates.append({
+                    "name": cand,
+                    "context": line_clean,
+                    "google_maps_url": map_url
+                })
                 continue
                 
         pin_match = re.search(r"[📍📌🚩]\s*([A-Za-z0-9가-힣\s\'-]{2,30})", line_clean)
         if pin_match:
             cand = pin_match.group(1).strip()
             if cand and len(cand) > 1:
-                extracted_candidates.append((cand, line_clean))
+                extracted_candidates.append({
+                    "name": cand,
+                    "context": line_clean,
+                    "google_maps_url": map_url
+                })
+                continue
+
+        num_match = re.search(r"^\d+\.\s*([A-Za-z0-9가-힣\s\'-]{2,30})", line_clean)
+        if num_match:
+            cand = num_match.group(1).split(":")[0].strip()
+            if cand and len(cand) > 1:
+                extracted_candidates.append({
+                    "name": cand,
+                    "context": line_clean,
+                    "google_maps_url": map_url
+                })
                 continue
 
     return video_info, extracted_candidates
@@ -182,6 +216,7 @@ def process_url_and_save_places(url, manual_places=None, region_hint=""):
             tag = item.get("tag", "")
             region = item.get("region", region_hint)
             notes = item.get("notes", f"출처 링크: {url}")
+            gmaps_url = item.get("google_maps_url")
             
             place, is_dup = add_place(
                 name=name,
@@ -189,7 +224,8 @@ def process_url_and_save_places(url, manual_places=None, region_hint=""):
                 tag=tag,
                 region=region,
                 notes=notes,
-                source_url=url
+                source_url=url,
+                google_maps_url=gmaps_url
             )
             saved_results.append({
                 "place": place,
@@ -216,7 +252,18 @@ def process_url_and_save_places(url, manual_places=None, region_hint=""):
             candidates.append((match.group(1).strip(), "본문 발췌"))
 
     # Save candidates
-    for name, context in candidates:
+    for item in candidates:
+        if isinstance(item, dict):
+            name = item.get("name", "").strip()
+            context = item.get("context", "")
+            gmaps_url = item.get("google_maps_url")
+        else:
+            name, context = item
+            gmaps_url = None
+
+        if not name:
+            continue
+
         cat = classify_category(name, f"{content_title} {context}")
         place, is_dup = add_place(
             name=name,
@@ -224,7 +271,8 @@ def process_url_and_save_places(url, manual_places=None, region_hint=""):
             tag=context[:50],
             region=region_hint,
             notes=f"수집 출처: {content_title} ({url})",
-            source_url=url
+            source_url=url,
+            google_maps_url=gmaps_url
         )
         saved_results.append({
             "place": place,
