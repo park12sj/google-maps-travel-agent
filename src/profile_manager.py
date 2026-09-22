@@ -181,6 +181,12 @@ def update_profile_with_feedback(feedback_text):
     # Regenerate Markdown
     generate_profile_markdown(updated_profile)
 
+    try:
+        from .git_sync import git_auto_push
+        git_auto_push(f"feat(profile): 여행 취향 프로필 동적 업데이트 ({changes[0] if changes else '피드백 반영'})")
+    except Exception:
+        pass
+
     return {
         "status": "success",
         "timestamp": now_str,

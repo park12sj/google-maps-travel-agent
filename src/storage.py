@@ -49,15 +49,22 @@ def load_places():
             return []
 
 
-def save_places(places):
-    """Save places list to master database and auto-sync MyMaps CSVs."""
+def save_places(places, auto_push=True):
+    """Save places list to master database, auto-sync MyMaps CSVs, and push to remote git."""
     PLACES_MASTER_PATH.parent.mkdir(parents=True, exist_ok=True)
     with open(PLACES_MASTER_PATH, "w", encoding="utf-8") as f:
         json.dump(places, f, ensure_ascii=False, indent=2)
     sync_mymaps_csvs(places)
+    
+    if auto_push:
+        try:
+            from .git_sync import git_auto_push
+            git_auto_push(f"feat(places): 장소 DB 및 MyMaps CSV 자동 동기화 ({len(places)}곳)")
+        except Exception:
+            pass
 
 
-def add_place(name, category, tag="", region="", notes="", source_url="", google_maps_url=None):
+def add_place(name, category, tag="", region="", notes="", source_url="", google_maps_url=None, auto_push=True):
     """
     Add a new place to master database (with duplicate check).
     Returns (created_place, is_duplicate).
@@ -75,7 +82,7 @@ def add_place(name, category, tag="", region="", notes="", source_url="", google
                 p["notes"] = f"{p.get('notes', '')} | {notes}".strip(" |")
             if google_maps_url and ("search/?api=1" in p.get("google_maps_url", "") or not p.get("google_maps_url")):
                 p["google_maps_url"] = google_maps_url
-            save_places(places)
+            save_places(places, auto_push=auto_push)
             return p, True
 
     # Assign new ID
@@ -104,7 +111,7 @@ def add_place(name, category, tag="", region="", notes="", source_url="", google
     }
 
     places.append(new_place)
-    save_places(places)
+    save_places(places, auto_push=auto_push)
     return new_place, False
 
 

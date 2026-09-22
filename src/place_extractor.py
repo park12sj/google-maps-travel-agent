@@ -225,16 +225,24 @@ def process_url_and_save_places(url, manual_places=None, region_hint=""):
                 region=region,
                 notes=notes,
                 source_url=url,
-                google_maps_url=gmaps_url
+                google_maps_url=gmaps_url,
+                auto_push=False
             )
             saved_results.append({
                 "place": place,
                 "is_duplicate": is_dup,
                 "action": "updated" if is_dup else "added"
             })
+        if saved_results:
+            try:
+                from .git_sync import git_auto_push
+                git_auto_push(f"feat(places): 수집 장소 {len(saved_results)}개 자동 동기화 ({url})")
+            except Exception:
+                pass
         return saved_results
 
     # Automated extraction
+    content_title = ""
     if "youtube.com" in url or "youtu.be" in url:
         info, candidates = extract_from_youtube(url)
         content_title = info.get("title", "")
@@ -272,13 +280,22 @@ def process_url_and_save_places(url, manual_places=None, region_hint=""):
             region=region_hint,
             notes=f"수집 출처: {content_title} ({url})",
             source_url=url,
-            google_maps_url=gmaps_url
+            google_maps_url=gmaps_url,
+            auto_push=False
         )
         saved_results.append({
             "place": place,
             "is_duplicate": is_dup,
             "action": "updated" if is_dup else "added"
         })
+
+    if saved_results:
+        try:
+            from .git_sync import git_auto_push
+            title_summary = f" ({content_title[:25]})" if content_title else ""
+            git_auto_push(f"feat(places): 수집 장소 {len(saved_results)}개 자동 동기화{title_summary}")
+        except Exception:
+            pass
 
     return saved_results
 

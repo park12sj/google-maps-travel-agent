@@ -112,11 +112,19 @@ def handle_list(args):
         print(f" - [{p.get('category')}] {p.get('name')} | 지역: {p.get('region')} | {p.get('google_maps_url')}")
 
 
+def handle_push(args):
+    print("🚀 원격 저장소(origin main)로 최신 변경사항을 푸시합니다...")
+    from src.git_sync import git_auto_push
+    result = git_auto_push(commit_message=args.message)
+    if result.get("success"):
+        print(result.get("message"))
+    else:
+        print(f"❌ 푸시 실패: {result.get('reason')}")
+
+
 def main():
-    parser = argparse.ArgumentParser(
-        description="구글 지도 저장함 및 여행 플래닝 에이전트 CLI"
-    )
-    subparsers = parser.add_subparsers(dest="command", help="실행할 명령")
+    parser = argparse.ArgumentParser(description="구글 지도 저장함 및 여행 일정 지능형 에이전트 CLI")
+    subparsers = parser.add_subparsers(dest="command", help="실행할 하위 명령")
 
     # add-link
     parser_add = subparsers.add_parser("add-link", help="유튜브/블로그 링크 속 장소 추출 및 저장")
@@ -145,6 +153,10 @@ def main():
     parser_list.add_argument("--category", "-c", choices=CATEGORIES, help="카테고리 필터")
     parser_list.add_argument("--query", "-q", help="검색어")
 
+    # push
+    parser_push = subparsers.add_parser("push", help="원격 저장소(origin main)로 최신 변경사항 수동/강제 푸시")
+    parser_push.add_argument("--message", "-m", help="커밋 메시지 (미지정 시 자동 생성)")
+
     args = parser.parse_args()
 
     if args.command == "add-link":
@@ -159,6 +171,8 @@ def main():
         handle_profile(args)
     elif args.command == "list":
         handle_list(args)
+    elif args.command == "push":
+        handle_push(args)
     else:
         parser.print_help()
 

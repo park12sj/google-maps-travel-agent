@@ -280,6 +280,12 @@ def generate_itinerary(hotel_info, days, region=None, additional_notes=""):
     with open(file_path, "w", encoding="utf-8") as f:
         f.write(markdown_text)
 
+    try:
+        from .git_sync import git_auto_push
+        git_auto_push(f"feat(itinerary): {region} {days}일차 맞춤 여행 일정 생성 ({filename})")
+    except Exception:
+        pass
+
     return {
         "file_path": str(file_path),
         "region": region,
