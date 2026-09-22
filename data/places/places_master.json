@@ -650,13 +650,13 @@
   },
   {
     "id": "place_060",
-    "name": "Lai Heen",
+    "name": "라이힌 (Lai Heen / 麗軒)",
     "category": "식당 및 카페",
-    "tag": "미슐랭 광둥 요리",
+    "tag": "미슐랭 1스타, 리츠칼튼 51층 광둥요리, 딤섬 명가",
     "region": "마카오",
-    "original_source": "가고 싶은 장소",
-    "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Lai%20Heen",
-    "notes": "미슐랭 광둥 요리 (원래 목록: 가고 싶은 장소)",
+    "original_source": "가고 싶은 장소, https://youtu.be/4FPa5Kgz04o?si=1vP7H6U0HhA_TLCx",
+    "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Lai+Heen+The+Ritz-Carlton+Macau",
+    "notes": "미슐랭 광둥 요리 (원래 목록: 가고 싶은 장소) | [연차없이 어떡행 EP.4 추천 1위 맛집] 갤럭시 마카오 리츠칼튼 51층 미슐랭 1스타 파인다이닝. 시그니처 금붕어 모양 랍스터 날치알 딤섬(감탄 연발 1위 선정), 통새우 하가우(2위), 버섯 트러플 딤섬, 제비집 생선부레 스프 코스",
     "added_at": "2026-09-22T12:00:00"
   },
   {
@@ -1087,5 +1087,170 @@
     "google_maps_url": "https://maps.app.goo.gl/LvVB5LQabR3ecRiK9",
     "notes": "바삭하고 달콤한 고구마스틱(이모켄피), 텐진 지하상가 필수 간식 | 고구마튀김 / 켄피 디저트 - 바삭하고 달콤한 고구마스틱(이모켄피), 텐진 지하상가 필수 간식",
     "added_at": "2026-09-22T13:55:43"
+  },
+  {
+    "id": "place_100",
+    "name": "스튜디오 시티 마카오 (Studio City Macau / 新濠影滙)",
+    "category": "숙박",
+    "tag": "5성급 복합 리조트, 8자 대관람차 골든릴, 워터파크, 공항 셔틀",
+    "region": "마카오",
+    "original_source": "https://youtu.be/4FPa5Kgz04o?si=1vP7H6U0HhA_TLCx",
+    "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Studio+City+Macau",
+    "notes": "[연차없이 어떡행 EP.4 1박2일 숙소] 할리우드 영화 테마의 초대형 5성급 복합 리조트. 호텔 중앙에 세계 최초 8자 모양 대관람차(골든릴)가 있으며, 마카오 공항에서 무료 셔틀버스 운행",
+    "added_at": "2026-09-22T16:04:33"
+  },
+  {
+    "id": "place_101",
+    "name": "세나도 광장 (Senado Square / 議事亭前地)",
+    "category": "유적지 및 관광지",
+    "tag": "유네스코 세계문화유산, 물결무늬 모자이크 깔사다 타일, 마카오 여행 필수 시작점",
+    "region": "마카오",
+    "original_source": "https://youtu.be/4FPa5Kgz04o?si=1vP7H6U0HhA_TLCx",
+    "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Senado+Square+Macau",
+    "notes": "[연차없이 어떡행 EP.4] 마카오 역사지구의 중심이자 여행의 시작점. 포르투갈 전통 양식의 물결무늬 모자이크 바닥(깔사다)과 파스텔톤 유럽풍 건축물들이 어우러진 유네스코 세계유산",
+    "added_at": "2026-09-22T16:04:33"
+  },
+  {
+    "id": "place_102",
+    "name": "성 도미니크 성당 (St. Dominic's Church / 玫瑰聖母堂)",
+    "category": "유적지 및 관광지",
+    "tag": "유네스코 세계문화유산, 16세기 바로크 양식 성당, 노란 외벽 포토스팟",
+    "region": "마카오",
+    "original_source": "https://youtu.be/4FPa5Kgz04o?si=1vP7H6U0HhA_TLCx",
+    "google_maps_url": "https://www.google.com/maps/search/?api=1&query=St+Dominic+Church+Macau",
+    "notes": "[연차없이 어떡행 EP.4] 세나도 광장 안쪽에 위치한 1587년 건립 바로크 양식 성당. 크림빛 노란 외벽과 짙은 초록색 덧문이 인상적인 마카오 대표 랜드마크 포토존",
+    "added_at": "2026-09-22T16:04:33"
+  },
+  {
+    "id": "place_103",
+    "name": "성 바울 성당 유적 (Ruins of Saint Paul's / 大三巴牌坊)",
+    "category": "유적지 및 관광지",
+    "tag": "마카오 최고 상징 랜드마크, 17세기 석조 외벽 파사드, 유네스코 세계문화유산",
+    "region": "마카오",
+    "original_source": "https://youtu.be/4FPa5Kgz04o?si=1vP7H6U0HhA_TLCx",
+    "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Ruins+of+Saint+Paul+Macau",
+    "notes": "[연차없이 어떡행 EP.4] 17세기 건립 당시 아시아 최대 성당이었으나 화재로 정면 석조 파사드와 68개 화강암 계단만 남은 마카오의 독보적 랜드마크",
+    "added_at": "2026-09-22T16:04:33"
+  },
+  {
+    "id": "place_104",
+    "name": "바무 베이커리 (BAMU Bakery / 瓦煲烘焙)",
+    "category": "식당 및 카페",
+    "tag": "에그타르트 도장깨기 1탄, 페이스트리 결 에그타르트, MZ 신흥 맛집",
+    "region": "마카오",
+    "original_source": "https://youtu.be/4FPa5Kgz04o?si=1vP7H6U0HhA_TLCx",
+    "google_maps_url": "https://www.google.com/maps/search/?api=1&query=BAMU+Bakery+Macau",
+    "notes": "[연차없이 어떡행 EP.4 에그타르트 투어 1호점] 성 바울 성당 인근 최근 급부상한 신흥 핫플. 패스츄리 결이 겹겹이 살아있고 속의 계란 커스터드가 극도로 부드럽고 촉촉한 타입",
+    "added_at": "2026-09-22T16:04:33"
+  },
+  {
+    "id": "place_105",
+    "name": "만테이가리아 마카오 (Manteigaria Macau)",
+    "category": "식당 및 카페",
+    "tag": "에그타르트 도장깨기 2탄, 포르투갈 3대 에그타르트 마카오 지점, 극강의 바삭함",
+    "region": "마카오",
+    "original_source": "https://youtu.be/4FPa5Kgz04o?si=1vP7H6U0HhA_TLCx",
+    "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Manteigaria+Macau",
+    "notes": "[연차없이 어떡행 EP.4 에그타르트 투어 2호점] 포르투갈 리스본 3대 에그타르트 명소의 마카오 직영점. 한입 물었을 때 들리는 바삭한 ASMR 소리와 은은한 시나몬 향, 살아있는 계란 결이 특징",
+    "added_at": "2026-09-22T16:04:33"
+  },
+  {
+    "id": "place_106",
+    "name": "마가렛 카페 이 나타 (Margaret's Café e Nata / 瑪嘉烈蛋撻店)",
+    "category": "식당 및 카페",
+    "tag": "에그타르트 도장깨기 3탄, 마카오 에그타르트 양대산맥, 갓 구운 뜨거운 타르트",
+    "region": "마카오",
+    "original_source": "https://youtu.be/4FPa5Kgz04o?si=1vP7H6U0HhA_TLCx",
+    "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Margaret+Cafe+e+Nata+Macau",
+    "notes": "[연차없이 어떡행 EP.4 에그타르트 투어 3호점] 로드 스토우즈와 함께 마카오 양대산맥. 갓 구워져 나온 뜨거운 타르트로, 페이스트리와 순수 버터·계란 필링의 완벽한 분리도와 고소한 풍미가 일품",
+    "added_at": "2026-09-22T16:04:33"
+  },
+  {
+    "id": "place_107",
+    "name": "로드 스토우즈 베이커리 (Lord Stow's Bakery / 安德魯餅店)",
+    "category": "식당 및 카페",
+    "tag": "에그타르트 도장깨기 4탄 1위 선정, 마카오 에그타르트 원조, 선물 포장 추천",
+    "region": "마카오",
+    "original_source": "https://youtu.be/4FPa5Kgz04o?si=1vP7H6U0HhA_TLCx",
+    "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Lord+Stow+Bakery+Macau",
+    "notes": "[연차없이 어떡행 EP.4 에그타르트 도장깨기 최종 1등 선정!] 영국인 앤드루 스토우가 1989년 창업한 마카오 에그타르트의 시초이자 원조. 식어도 버터와 커스터드의 깊은 풍미가 완벽하게 유지되어 한국 포장 귀국용으로 극찬",
+    "added_at": "2026-09-22T16:04:33"
+  },
+  {
+    "id": "place_108",
+    "name": "윙치케이 (Wong Chi Kei / 黃枝記)",
+    "category": "식당 및 카페",
+    "tag": "80년 전통 1위 새우 완탕면, 수제 대나무 탄력 죽승면, 마카오 맥주 조합",
+    "region": "마카오",
+    "original_source": "https://youtu.be/4FPa5Kgz04o?si=1vP7H6U0HhA_TLCx",
+    "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Wong+Chi+Kei+Senado+Square+Macau",
+    "notes": "[연차없이 어떡행 EP.4 저녁 만찬] 세나도 광장 바로 앞 1946년 개업 80년 전통 노포. 대나무로 반죽한 꼬들꼬들한 죽승면에 통새우가 가득 씹히는 완탕, 시원한 마카오 맥주(꽃향 라거)와의 페어링 강추",
+    "added_at": "2026-09-22T16:04:33"
+  },
+  {
+    "id": "place_109",
+    "name": "마카오 오픈탑 야경 투어 버스 (Macau Open Top Bus Night Tour)",
+    "category": "유적지 및 관광지",
+    "tag": "코타이 스트립 호텔 야경 투어, 2층 오픈탑 버스, 마카오 밤 필수 코스",
+    "region": "마카오",
+    "original_source": "https://youtu.be/4FPa5Kgz04o?si=1vP7H6U0HhA_TLCx",
+    "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Macau+Open+Top+Bus+Night+Tour",
+    "notes": "[연차없이 어떡행 EP.4 1일차 피날레] 낭만 오픈탑 2층 버스. 베네시안, 파리지앵, 런더너, 갤럭시 등 화려한 코타이 스트립 호텔들의 야경을 한눈에 감상하는 인기 투어",
+    "added_at": "2026-09-22T16:04:33"
+  },
+  {
+    "id": "place_110",
+    "name": "파리지앵 마카오 에펠탑 (Eiffel Tower at The Parisian Macao / 巴黎鐵塔)",
+    "category": "유적지 및 관광지",
+    "tag": "코타이 스트립 야경 랜드마크, 파리 에펠탑 1/2 크기 재현, 화려한 조명 쇼",
+    "region": "마카오",
+    "original_source": "https://youtu.be/4FPa5Kgz04o?si=1vP7H6U0HhA_TLCx",
+    "google_maps_url": "https://www.google.com/maps/search/?api=1&query=The+Parisian+Macao+Eiffel+Tower",
+    "notes": "[연차없이 어떡행 EP.4 야경 투어 경유] 파리 에펠탑을 실제의 50% 크기로 정교하게 복제한 코타이 스트립의 대표 랜드마크. 밤마다 화려한 라이트 쇼가 펼쳐짐",
+    "added_at": "2026-09-22T16:04:33"
+  },
+  {
+    "id": "place_111",
+    "name": "런더너 마카오 빅벤 (Big Ben at The Londoner Macao / 澳門倫敦人 伊麗莎白塔)",
+    "category": "유적지 및 관광지",
+    "tag": "코타이 스트립 야경 명소, 96m 실물 크기 엘리자베스 타워(빅벤), 영국 테마",
+    "region": "마카오",
+    "original_source": "https://youtu.be/4FPa5Kgz04o?si=1vP7H6U0HhA_TLCx",
+    "google_maps_url": "https://www.google.com/maps/search/?api=1&query=The+Londoner+Macao+Big+Ben",
+    "notes": "[연차없이 어떡행 EP.4 야경 투어 경유] 영국 런던 웨스트민스터 궁전 외관과 높이 96m의 실물 크기 빅벤을 완벽 재현한 야경 사진 명소",
+    "added_at": "2026-09-22T16:04:33"
+  },
+  {
+    "id": "place_112",
+    "name": "모르페우스 호텔 (Morpheus Hotel / 摩珀斯)",
+    "category": "유적지 및 관광지",
+    "tag": "자하 하디드 설계 유작, 세계 최초 자유형 외골격 기둥 없는 건축, 시티오브드림즈",
+    "region": "마카오",
+    "original_source": "https://youtu.be/4FPa5Kgz04o?si=1vP7H6U0HhA_TLCx",
+    "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Morpheus+Hotel+Macau",
+    "notes": "[연차없이 어떡행 EP.4 야경 투어 경유] 세계 최초 기둥 없는 초현대식 건축물. 자하 하디드가 설계한 기하학적 그물망 외골격 구조가 압도적인 호텔",
+    "added_at": "2026-09-22T16:04:33"
+  },
+  {
+    "id": "place_113",
+    "name": "윈 팰리스 분수쇼 & 스카이캡 (Wynn Palace Performance Lake & SkyCab / 永利皇宮 表演湖)",
+    "category": "유적지 및 관광지",
+    "tag": "마카오 대표 음악 분수쇼, 호텔 무료 케이블카(스카이캡), 웅장한 물의 춤",
+    "region": "마카오",
+    "original_source": "https://youtu.be/4FPa5Kgz04o?si=1vP7H6U0HhA_TLCx",
+    "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Wynn+Palace+Performance+Lake+Macau",
+    "notes": "[연차없이 어떡행 EP.4 야경 투어 하이라이트] 윈 팰리스 호텔 앞 거대 인공 호수에서 펼쳐지는 웅장한 음악 분수쇼. 호수 상공을 지나는 무료 스카이캡 케이블카에서 공중 관람 가능",
+    "added_at": "2026-09-22T16:04:33"
+  },
+  {
+    "id": "place_114",
+    "name": "갤럭시 마카오 (Galaxy Macau / 澳門銀河)",
+    "category": "유적지 및 관광지",
+    "tag": "황금빛 초대형 복합 리조트 단지, 다이아몬드 로비 쇼, 그랜드 리조트 덱",
+    "region": "마카오",
+    "original_source": "https://youtu.be/4FPa5Kgz04o?si=1vP7H6U0HhA_TLCx",
+    "google_maps_url": "https://www.google.com/maps/search/?api=1&query=Galaxy+Macau",
+    "notes": "[연차없이 어떡행 EP.4] 9개 호텔이 거대한 금빛 궁전처럼 연결된 마카오 최대 복합 리조트. 리츠칼튼 라이힌이 위치한 메인 단지",
+    "added_at": "2026-09-22T16:04:33"
   }
 ]
