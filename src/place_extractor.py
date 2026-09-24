@@ -20,7 +20,7 @@ CATEGORY_RULES = {
         "식당", "맛집", "카페", "cafe", "coffee", "디저트", "베이커리", "빵집", "바", "bar",
         "타파스", "tapas", "레스토랑", "restaurant", "음식점", "브런치", "라멘", "스시",
         "이자카야", "피자", "파스타", "와인", "맥주", "펍", "pub", "bistro", "비스트로",
-        "bbq", "고기", "국수", "디저트카페", "베이크", "브루어리", "brewery"
+        "bbq", "고기", "국수", "디저트카페", "베이크", "브루어리", "brewery", "라운지", "lounge"
     ],
     "숙박": [
         "호텔", "hotel", "호스텔", "hostel", "리조트", "resort", "숙소", "에어비앤비", "airbnb",
@@ -29,7 +29,8 @@ CATEGORY_RULES = {
     "유적지 및 관광지": [
         "성당", "catedral", "cathedral", "성", "castle", "박물관", "museum", "미술관",
         "gallery", "사원", "신사", "temple", "shrine", "전망대", "observatory", "tower", "타워",
-        "광장", "plaza", "palace", "궁전", "궁", "유적", "스튜디오", "테마파크", "기념관", "투어"
+        "광장", "plaza", "palace", "궁전", "궁", "유적", "스튜디오", "테마파크", "기념관", "투어",
+        "뮤지엄", "art center", "포럼", "forum", "시티뷰", "city view", "전망"
     ],
     "자연 및 공원": [
         "공원", "park", "해변", "beach", "playa", "cala", "바다", "산", "mountain", "계곡",
@@ -46,6 +47,10 @@ def classify_category(name, text_context=""):
     """Classify place into one of the 6 canonical categories."""
     haystack = f"{name} {text_context}".lower()
     
+    # Hotel dining/cafe special handling: "호텔 카페", "호텔 라운지", "lounge" should be dining/cafe, not lodging
+    if any(k in haystack for k in ["호텔 카페", "호텔 라운지", "호텔 레스토랑", "호텔 바", "hotel cafe", "hotel lounge", "라운지 카페", "라운지", "lounge"]):
+        return "식당 및 카페"
+
     # Priority order for classification
     for cat in ["숙박", "식당 및 카페", "쇼핑 및 시장", "유적지 및 관광지", "자연 및 공원"]:
         keywords = CATEGORY_RULES[cat]
@@ -54,6 +59,31 @@ def classify_category(name, text_context=""):
                 return cat
                 
     return "기타"
+
+
+def normalize_region_hint(region, text_context=""):
+    """Normalize or infer standardized region name (e.g. 일본 도쿄, 일본 후쿠오카)."""
+    r = (region or "").strip()
+    c = f"{r} {text_context}".lower()
+
+    if any(k in c for k in ["도쿄", "tokyo", "東京"]):
+        return "일본 도쿄"
+    if any(k in c for k in ["후쿠오카", "fukuoka"]):
+        return "일본 후쿠오카"
+    if any(k in c for k in ["오사카", "osaka"]):
+        return "일본 오사카"
+    if any(k in c for k in ["삿포로", "sapporo"]):
+        return "일본 삿포로"
+    if any(k in c for k in ["스페인", "바르셀로나", "마드리드", "포르투갈"]):
+        return "스페인_포르투갈"
+    if any(k in c for k in ["대만", "타이베이", "가오슝"]):
+        return "대만"
+    if any(k in c for k in ["마카오"]):
+        return "마카오"
+    if any(k in c for k in ["하노이", "베트남", "다낭"]):
+        return "베트남 하노이"
+        
+    return r or "기타"
 
 
 import ssl
@@ -198,6 +228,137 @@ def extract_from_naver_blog(url, html_content=""):
     return {"title": title, "url": url}, extracted_candidates
 
 
+def extract_from_instagram(url, html_content=""):
+    """
+    Extract place mentions, metadata, and carousel slides from Instagram post or reel.
+    Supports /p/, /reel/, /reels/ formats.
+    Fetches embed (/embed/captioned/) and/or OpenGraph fallback with crawler User-Agent.
+    """
+    shortcode_match = re.search(r'instagram\.com/(?:p|reel|reels)/([A-Za-z0-9_-]+)', url)
+    shortcode = shortcode_match.group(1) if shortcode_match else ""
+
+    info = {
+        "title": "",
+        "caption": "",
+        "author": "",
+        "slides": [],
+        "places": []
+    }
+
+    ctx = ssl._create_unverified_context()
+    
+    # 1. Try captioned embed first (gives full caption + carousel slides in JSON)
+    embed_url = f"https://www.instagram.com/p/{shortcode}/embed/captioned/" if shortcode else url
+    embed_html = ""
+    try:
+        req = urllib.request.Request(
+            embed_url,
+            headers={
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                              "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            }
+        )
+        with urllib.request.urlopen(req, timeout=10, context=ctx) as resp:
+            embed_html = resp.read().decode("utf-8", errors="ignore")
+    except Exception:
+        pass
+
+    if embed_html:
+        caption_match = re.search(r'<div class="Caption"[^>]*>(.*?)</div>', embed_html, re.DOTALL)
+        if caption_match:
+            c_text = html.unescape(caption_match.group(1))
+            c_text = re.sub(r'<br\s*/?>', '\n', c_text)
+            c_text = re.sub(r'<[^>]+>', ' ', c_text)
+            info["caption"] = c_text.strip()
+            
+        author_match = re.search(r'<a class="CaptionUsername"[^>]*>(.*?)</a>', embed_html)
+        if author_match:
+            info["author"] = html.unescape(author_match.group(1)).strip()
+
+        # Extract carousel slides if available
+        parts = embed_html.split('display_url\\":\\"https:')
+        if len(parts) > 1:
+            seen_slides = set()
+            for p in parts[1:]:
+                raw_u = 'https:' + p.split('\\"')[0]
+                clean_u = raw_u.replace(r'\\\/', '/').replace(r'\/', '/').replace('\\\\u0026', '&').replace('\\u0026', '&')
+                base_id = clean_u.split('?')[0].split('/')[-1]
+                if base_id not in seen_slides:
+                    seen_slides.add(base_id)
+                    info["slides"].append(clean_u)
+
+    # 2. If caption is still empty or short, fetch original URL with crawler User-Agent
+    if not info["caption"]:
+        crawler_ua = "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)"
+        try:
+            req2 = urllib.request.Request(url, headers={"User-Agent": crawler_ua})
+            with urllib.request.urlopen(req2, timeout=10, context=ctx) as resp2:
+                crawler_html = resp2.read().decode("utf-8", errors="ignore")
+                og_title = re.search(r'property="(?:og:title|twitter:title)" content="([^"]*)"', crawler_html)
+                og_desc = re.search(r'property="(?:og:description|twitter:description|description)" content="([^"]*)"', crawler_html)
+                t = html.unescape(og_title.group(1)) if og_title else ""
+                d = html.unescape(og_desc.group(1)) if og_desc else ""
+                info["caption"] = d or t
+        except Exception:
+            pass
+
+    full_text = f"{info.get('author', '')}\n{info.get('caption', '')}"
+    info["title"] = info["caption"].splitlines()[0][:60] if info["caption"] else "Instagram Post"
+
+    # 3. Extract place candidates from caption text
+    extracted_candidates = []
+    lines = [l.strip() for l in full_text.splitlines() if l.strip()]
+    ignore_pin_words = ['영상 저장', '댓글', 'DM', '구글맵', '팔로우', '좋아요', '공유', '링크', '프로필', '클래스', '광고']
+
+    current_cand = None
+    for line in lines:
+        # Check for pins / icons
+        pin_match = re.search(r'^[📍📌🚩🏩🏛️☕🍽️]\s*(.+)', line)
+        if pin_match:
+            raw_name = pin_match.group(1).strip()
+            if any(ign in raw_name for ign in ignore_pin_words):
+                continue
+            clean_name = re.sub(r'@[A-Za-z0-9_.]+', '', raw_name).strip()
+            clean_name = re.sub(r'^\d+\.\s*', '', clean_name).strip()
+            if len(clean_name) > 1:
+                current_cand = {
+                    "name": clean_name,
+                    "context": line,
+                    "details": [],
+                    "google_maps_url": None
+                }
+                extracted_candidates.append(current_cand)
+                continue
+
+        # Numbered list pattern: 1. 명소이름 or [1] 명소이름
+        num_match = re.search(r'^(?:[0-9]{1,2}\.|\([0-9]{1,2}\)|\[[0-9]{1,2}\])\s*([A-Za-z0-9가-힣\s\'-]{2,40})', line)
+        if num_match:
+            cand = num_match.group(1).split(":")[0].strip()
+            cand_clean = re.sub(r'@[A-Za-z0-9_.]+', '', cand).strip()
+            if len(cand_clean) > 1 and not any(ign in cand_clean for ign in ignore_pin_words):
+                current_cand = {
+                    "name": cand_clean,
+                    "context": line,
+                    "details": [],
+                    "google_maps_url": None
+                }
+                extracted_candidates.append(current_cand)
+                continue
+
+        # If we have a current candidate, attach subsequent details like address or operating hours
+        if current_cand:
+            if line.startswith('•') or line.startswith('⏰') or 'Tokyo' in line or '일본' in line or '~' in line or 'Chome' in line or '〒' in line or 'City' in line or '구' in line or '로' in line:
+                detail_clean = line.lstrip('•⏰ ').strip()
+                if detail_clean:
+                    current_cand["details"].append(detail_clean)
+
+    for cand in extracted_candidates:
+        if cand.get("details"):
+            cand["context"] = f"{cand['context']} ({', '.join(cand['details'])})"
+
+    return info, extracted_candidates
+
+
 def process_url_and_save_places(url, manual_places=None, region_hint=""):
     """
     Main extraction function.
@@ -214,7 +375,8 @@ def process_url_and_save_places(url, manual_places=None, region_hint=""):
                 continue
             cat = item.get("category") or classify_category(name, item.get("notes", ""))
             tag = item.get("tag", "")
-            region = item.get("region", region_hint)
+            raw_region = item.get("region") or region_hint
+            region = normalize_region_hint(raw_region, f"{name} {tag} {item.get('notes', '')}")
             notes = item.get("notes", f"출처 링크: {url}")
             gmaps_url = item.get("google_maps_url")
             
@@ -249,6 +411,9 @@ def process_url_and_save_places(url, manual_places=None, region_hint=""):
     elif "blog.naver.com" in url:
         info, candidates = extract_from_naver_blog(url)
         content_title = info.get("title", "")
+    elif "instagram.com" in url:
+        info, candidates = extract_from_instagram(url)
+        content_title = info.get("title", "")
     else:
         # Generic website / Tistory
         html_content = fetch_url_content(url)
@@ -259,26 +424,36 @@ def process_url_and_save_places(url, manual_places=None, region_hint=""):
         for match in re.finditer(r'[📍📌🚩]\s*([A-Za-z0-9가-힣\s\'-]{2,30})', html_content):
             candidates.append((match.group(1).strip(), "본문 발췌"))
 
+    # Auto-infer & normalize region
+    cand_text = " ".join(c.get("name", "") + " " + c.get("context", "") if isinstance(c, dict) else str(c) for c in candidates)
+    region_hint = normalize_region_hint(region_hint, f"{url} {content_title} {cand_text}")
+
     # Save candidates
     for item in candidates:
         if isinstance(item, dict):
             name = item.get("name", "").strip()
             context = item.get("context", "")
             gmaps_url = item.get("google_maps_url")
+            details = item.get("details", [])
         else:
             name, context = item
             gmaps_url = None
+            details = []
 
         if not name:
             continue
 
         cat = classify_category(name, f"{content_title} {context}")
+        
+        detail_note = f" ({'; '.join(details)})" if details else ""
+        item_region = normalize_region_hint(region_hint, f"{name} {context} {detail_note}")
+        
         place, is_dup = add_place(
             name=name,
             category=cat,
-            tag=context[:50],
-            region=region_hint,
-            notes=f"수집 출처: {content_title} ({url})",
+            tag=context[:60],
+            region=item_region,
+            notes=f"수집 출처: {content_title} ({url}){detail_note}",
             source_url=url,
             google_maps_url=gmaps_url,
             auto_push=False

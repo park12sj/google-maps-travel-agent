@@ -9,7 +9,7 @@
 ```mermaid
 flowchart TD
     subgraph Input["입력 채널"]
-        U1["유튜브 / 블로그 링크"]
+        U1["유튜브 / 블로그 / 인스타그램 링크"]
         U2["숙소 정보 + 여행 일수"]
         U3["일정에 대한 사용자 피드백"]
     end
@@ -43,8 +43,20 @@ flowchart TD
 
 ---
 
+## 🚀 원격 저장소 자동 동기화 원칙 (Remote Git Auto-Push by Default)
+- **원격 동기화 기본 탑재**: 장소 수집(`add-link`), 일정표 생성(`plan`), 사용자 취향 피드백 갱신(`feedback`), 구글 내 지도 CSV 동기화(`mymaps`) 등 데이터베이스나 설정에 변경이 발생하는 모든 작업 완료 시, 별도의 사용자 요청 없이 **`git push origin main`이 디폴트(Default)로 자동 실행**됩니다.
+- **자동 커밋 & 푸시 모듈**: `src/git_sync.py` (`git_auto_push` 함수)
+- **수동 푸시 CLI 명령어**: `python3 cli.py push [--message "<커밋 메시지>"]`
+- **장점**: 로컬 작업과 깃허브 원격 저장소가 실시간 100% 동기화되어 언제 어디서든 최신 데이터와 내 지도 파일을 확인 가능합니다.
+
+---
+
 ## 1. 장소 수집 및 저장 에이전트 (Place Ingestion Agent)
-- **역할**: 유튜브 영상 또는 블로그(네이버, 티스토리 등) 링크를 제공받아, 본문 속 언급된 장소를 추출하고 6대 카테고리로 자동 분류하여 마스터 DB 및 구글 내 지도(My Maps) 단일 통합 CSV에 반영합니다.
+- **역할**: 유튜브 영상, 블로그(네이버, 티스토리 등), 또는 **인스타그램(릴스, 피드 게시물, 캐러셀 카드뉴스)** 링크를 제공받아, 본문 및 캡션 속 언급된 장소를 추출하고 6대 카테고리로 자동 분류하여 마스터 DB 및 구글 내 지도(My Maps) 지역별·통합 CSV에 반영합니다.
+- **인스타그램 지원 사양**:
+  - `instagram.com/reel/`, `instagram.com/p/`, `instagram.com/reels/` URL을 지원합니다.
+  - 임베드 캡션 API(`/embed/captioned/`) 및 소셜 크롤러 User-Agent(`facebookexternalhit/1.1`)를 결합하여 비로그인 환경에서도 본문 캡션, 장소 핀(`📍`, `📌`, `🚩`, `🏩`, `☕`, `🍽️`), 주소, 영업시간, 캐러셀 이미지 슬라이드를 안정적으로 추출합니다.
+  - 이미지 내 텍스트(카드뉴스/캐러셀) 형태로 제공되는 장소명도 멀티모달 시각 분석을 통해 빠짐없이 수집합니다.
 - **6대 카테고리**:
   1. `식당 및 카페`
   2. `숙박`
@@ -140,6 +152,7 @@ flowchart TD
 │   ├── place_extractor.py         # 유튜브/블로그 링크 파싱 및 장소 추출
 │   ├── itinerary_generator.py     # 맞춤 일정표 생성 엔진
 │   ├── profile_manager.py         # 사용자 피드백 분석 & 프로필 동적 적응 엔진
-│   └── storage.py                 # 장소 저장/조회 및 MyMaps 동기화 모듈
+│   ├── storage.py                 # 장소 저장/조회 및 MyMaps 동기화 모듈
+│   └── git_sync.py                # 원격 저장소(origin main) 기본 자동 푸시 모듈
 └── legacy_tools/                  # 이전 자동화 및 백업 스크립트 보관
 ```

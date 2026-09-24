@@ -127,9 +127,9 @@ def main():
     subparsers = parser.add_subparsers(dest="command", help="실행할 하위 명령")
 
     # add-link
-    parser_add = subparsers.add_parser("add-link", help="유튜브/블로그 링크 속 장소 추출 및 저장")
-    parser_add.add_argument("url", help="유튜브 또는 블로그 URL")
-    parser_add.add_argument("--region", "-r", help="지역/도시 힌트 (예: 바르셀로나)")
+    parser_add = subparsers.add_parser("add-link", help="유튜브/블로그/인스타그램 링크 속 장소 추출 및 저장")
+    parser_add.add_argument("url", help="유튜브, 블로그 또는 인스타그램 URL")
+    parser_add.add_argument("--region", "-r", help="지역/도시 힌트 (예: 도쿄, 바르셀로나)")
 
     # plan
     parser_plan = subparsers.add_parser("plan", help="숙소 및 여행 일수 기반 맞춤 일정 계획 생성")
